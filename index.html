@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DigiSupply — Summit Healthcare</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#060b14;color:#e2e8f0;font-family:'Syne',sans-serif;min-height:100vh;}
+  ::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-track{background:#0f172a;} ::-webkit-scrollbar-thumb{background:#334155;border-radius:3px;}
+  input,select,textarea,button{font-family:'Syne',sans-serif;}
+  .mono{font-family:'DM Mono',monospace;}
+
+  /* Layout */
+  html,body{zoom:0.9;}
+  #hospital-portal,#staff-portal{display:flex;min-height:100vh;width:100%;}
+  .sidebar{width:240px;min-width:240px;background:#080d18;border-right:1px solid #1e293b;display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0;overflow-y:auto;}
+  .main{flex:1;padding:32px 36px;overflow-y:auto;min-width:0;}
+
+  /* Sidebar */
+  .sidebar-brand{padding:28px 20px 16px;}
+  .sidebar-label{font-size:10px;color:#38bdf8;letter-spacing:3px;font-weight:600;margin-bottom:6px;}
+  .sidebar-label.purple{color:#a78bfa;}
+  .sidebar-title{font-size:17px;font-weight:800;color:#f1f5f9;}
+  .sidebar-sub{font-size:11px;color:#334155;margin-top:2px;}
+  .sidebar-divider{height:1px;background:#1e293b;margin:0 16px;}
+  .sidebar-user{padding:12px 16px;margin:12px 10px;background:#0f172a;border-radius:10px;border:1px solid #1e293b;}
+  .sidebar-user .u-label{font-size:11px;color:#64748b;}
+  .sidebar-user .u-name{font-size:13px;font-weight:600;color:#38bdf8;margin-top:2px;}
+  .sidebar-user .u-id{font-size:11px;color:#475569;margin-top:2px;}
+  nav{padding:8px 10px;flex:1;}
+  .nav-btn{width:100%;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;background:transparent;color:#64748b;font-size:14px;font-weight:400;margin-bottom:4px;text-align:left;border-left:2px solid transparent;transition:all 0.15s;font-family:'Syne',sans-serif;}
+  .nav-btn.active{background:#0f172a;color:#38bdf8;font-weight:600;border-left:2px solid #38bdf8;}
+  .nav-btn.active.purple{color:#a78bfa;border-left-color:#a78bfa;}
+  .sidebar-footer{padding:16px 10px 24px;border-top:1px solid #1e293b;}
+  .logout-btn{width:100%;background:#1e293b;color:#94a3b8;border:none;border-radius:10px;padding:10px;cursor:pointer;font-size:13px;font-family:'Syne',sans-serif;}
+
+  /* Cards */
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:24px;}
+  .kpi-card{background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:22px 24px;position:relative;overflow:hidden;}
+  .kpi-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
+  .kpi-icon{font-size:26px;margin-bottom:8px;}
+  .kpi-value{font-size:28px;font-weight:700;color:#f1f5f9;}
+  .kpi-label{color:#94a3b8;font-size:13px;margin-top:4px;}
+  .kpi-sub{font-size:12px;margin-top:6px;}
+
+  /* Page header */
+  .page-header{margin-bottom:28px;}
+  .page-title{font-size:24px;font-weight:700;color:#f1f5f9;}
+  .page-sub{color:#64748b;font-size:14px;margin-top:4px;}
+
+  /* Table */
+  .table-wrap{background:#0f172a;border:1px solid #1e293b;border-radius:14px;overflow:hidden;}
+  table{width:100%;border-collapse:collapse;}
+  thead tr{background:#0a0f1e;border-bottom:1px solid #1e293b;}
+  th{text-align:left;padding:12px 16px;font-size:12px;color:#64748b;font-weight:600;}
+  tbody tr{border-bottom:1px solid #1e293b;}
+  tbody tr:last-child{border-bottom:none;}
+  td{padding:12px 16px;font-size:13px;color:#e2e8f0;}
+
+  /* Badge */
+  .badge{display:inline-block;border-radius:6px;padding:2px 10px;font-size:12px;font-weight:600;border:1px solid transparent;}
+
+  /* Forms */
+  .form-field{margin-bottom:16px;}
+  .form-label{font-size:13px;color:#94a3b8;display:block;margin-bottom:6px;}
+  .form-input{width:100%;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#f1f5f9;font-size:14px;outline:none;font-family:'Syne',sans-serif;}
+  .form-input:focus{border-color:#475569;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  /* Buttons */
+  .btn{border:none;border-radius:10px;padding:12px 20px;cursor:pointer;font-weight:600;font-size:14px;font-family:'Syne',sans-serif;transition:opacity 0.15s;}
+  .btn:hover{opacity:0.85;}
+  .btn-blue{background:#0ea5e9;color:#fff;}
+  .btn-purple{background:#a78bfa;color:#fff;}
+  .btn-red{background:#ef4444;color:#fff;}
+  .btn-ghost{background:#1e293b;color:#94a3b8;}
+  .btn-sm{padding:5px 14px;font-size:12px;border-radius:7px;}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+  /* Modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;}
+  .modal-box{background:#0f172a;border:1px solid #1e293b;border-radius:16px;padding:28px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;}
+  .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+  .modal-title{font-weight:700;font-size:18px;color:#f1f5f9;}
+  .modal-close{background:#1e293b;border:none;color:#94a3b8;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:18px;}
+
+  /* Login */
+  #login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+  .login-brand{margin-bottom:48px;text-align:center;}
+  .login-tag{font-size:11px;color:#38bdf8;letter-spacing:4px;font-weight:600;margin-bottom:8px;}
+  .login-title{font-size:42px;font-weight:800;color:#f1f5f9;}
+  .login-sub{color:#475569;font-size:15px;margin-top:6px;}
+  .portal-grid{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;}
+  .portal-card{background:#0f172a;border:2px solid #1e293b;border-radius:20px;padding:36px 44px;cursor:pointer;text-align:center;width:220px;transition:border-color 0.2s;}
+  .portal-card:hover.blue{border-color:#38bdf8;}
+  .portal-card:hover.purple{border-color:#a78bfa;}
+  .portal-icon{font-size:48px;margin-bottom:16px;}
+  .portal-title{font-size:18px;font-weight:700;color:#f1f5f9;margin-bottom:8px;}
+  .portal-desc{font-size:13px;color:#64748b;}
+  .login-box{background:#0f172a;border:1px solid #1e293b;border-radius:20px;padding:36px;width:400px;max-width:95vw;}
+  .login-box-header{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+  .back-btn{background:#1e293b;border:none;color:#94a3b8;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px;}
+  .login-box-title{font-size:20px;font-weight:700;color:#f1f5f9;}
+  .demo-creds{margin-top:16px;padding:12px;background:#1e293b;border-radius:10px;font-size:12px;color:#64748b;}
+  .demo-creds .title{color:#94a3b8;font-weight:600;margin-bottom:6px;}
+  .err-msg{color:#ef4444;font-size:13px;margin-bottom:12px;}
+
+  /* Status bars */
+  .progress-dots{display:flex;gap:4px;}
+  .dot{height:6px;border-radius:3px;}
+
+  /* Inventory cards */
+  .inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+  .inv-card{background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:20px;position:relative;}
+
+  /* Bar chart */
+  .bar-chart{display:flex;align-items:flex-end;gap:8px;height:160px;margin-bottom:8px;}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:0;cursor:pointer;position:relative;}
+  .bar-fill{width:100%;border-radius:6px 6px 0 0;transition:all 0.15s;}
+  .bar-label{font-size:10px;color:#64748b;margin-top:4px;}
+  .bar-tooltip{position:absolute;bottom:calc(100% + 6px);background:#1e293b;border:1px solid #334155;border-radius:8px;padding:8px 12px;z-index:10;white-space:nowrap;text-align:center;pointer-events:none;display:none;}
+  .bar-col:hover .bar-tooltip{display:block;}
+
+  /* Filter pills */
+  .filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+  .filter-btn{background:#1e293b;color:#94a3b8;border:none;border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;font-weight:500;font-family:'Syne',sans-serif;transition:all 0.15s;}
+  .filter-btn.active-blue{background:#0ea5e9;color:#fff;}
+  .filter-btn.active-purple{background:#a78bfa;color:#fff;}
+  .filter-btn.active-red{background:#ef4444;color:#fff;}
+
+  /* Success screen */
+  .success-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;text-align:center;}
+
+  /* Panel card */
+  .panel{background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:24px;}
+  .panel-title{font-weight:600;color:#e2e8f0;margin-bottom:16px;font-size:16px;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .action-cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;}
+  .action-card{background:#0f172a;border:2px dashed #1e293b;border-radius:16px;padding:28px;cursor:pointer;text-align:center;transition:border-color 0.2s;}
+
+  /* Ticket card */
+  .ticket-card{background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:20px;margin-bottom:12px;}
+
+  /* Hospital row */
+  .hosp-row{background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:20px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;margin-bottom:12px;}
+  .hosp-stats{display:flex;gap:20px;text-align:center;}
+
+  /* Priority buttons */
+  .prio-group{display:flex;gap:10px;}
+  .prio-btn{flex:1;padding:10px;border-radius:8px;background:#1e293b;border:2px solid #334155;color:#64748b;cursor:pointer;font-weight:600;font-size:13px;font-family:'Syne',sans-serif;transition:all 0.15s;}
+
+  .hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOGIN SCREEN ═══════════ -->
+<div id="login-screen">
+  <div class="login-brand">
+    <div class="login-tag">SUMMIT HEALTHCARE PVT. LTD.</div>
+    <div class="login-title">DigiSupply</div>
+    <div class="login-sub">Integrated Supply Chain & Service Portal</div>
+  </div>
+
+  <!-- Portal selection -->
+  <div id="portal-select" class="portal-grid">
+    <div class="portal-card blue" onclick="showLogin('hospital')">
+      <div class="portal-icon">🏥</div>
+      <div class="portal-title">Hospital Portal</div>
+      <div class="portal-desc">Place orders & raise complaints</div>
+    </div>
+    <div class="portal-card purple" onclick="showLogin('staff')">
+      <div class="portal-icon">🏢</div>
+      <div class="portal-title">Staff Dashboard</div>
+      <div class="portal-desc">Summit Healthcare internal view</div>
+    </div>
+  </div>
+
+  <!-- Hospital login -->
+  <div id="hospital-login" class="login-box hidden">
+    <div class="login-box-header">
+      <button class="back-btn" onclick="showPortalSelect()">←</button>
+      <div class="login-box-title">🏥 Hospital Login</div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Select Your Hospital</label>
+      <select id="h-hospital-select" class="form-input">
+        <option value="">Choose hospital...</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Password</label>
+      <input id="h-password" type="password" class="form-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')doHospitalLogin()"/>
+    </div>
+    <div id="h-err" class="err-msg hidden"></div>
+    <button class="btn btn-blue" style="width:100%" onclick="doHospitalLogin()">Login →</button>
+    <div class="demo-creds">
+      <div class="title">Demo credentials:</div>
+      <div>Lilavati Hospital → <span style="color:#38bdf8">lila123</span></div>
+      <div>Kokilaben Hospital → <span style="color:#38bdf8">koki123</span></div>
+      <div>Fortis Healthcare → <span style="color:#38bdf8">fort123</span></div>
+    </div>
+  </div>
+
+  <!-- Staff login -->
+  <div id="staff-login" class="login-box hidden">
+    <div class="login-box-header">
+      <button class="back-btn" onclick="showPortalSelect()">←</button>
+      <div class="login-box-title">🏢 Staff Login</div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Username</label>
+      <input id="s-username" class="form-input" placeholder="Enter username"/>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Password</label>
+      <input id="s-password" type="password" class="form-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')doStaffLogin()"/>
+    </div>
+    <div id="s-err" class="err-msg hidden"></div>
+    <button class="btn btn-purple" style="width:100%" onclick="doStaffLogin()">Login →</button>
+    <div class="demo-creds">
+      <div class="title">Demo credentials:</div>
+      <div>Username: <span style="color:#a78bfa">summit_admin</span></div>
+      <div>Password: <span style="color:#a78bfa">summit@123</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ HOSPITAL PORTAL ═══════════ -->
+<div id="hospital-portal" class="hidden" style="display:flex;min-height:100vh;">
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-label">SUMMIT HEALTHCARE</div>
+      <div class="sidebar-title">Hospital Portal</div>
+      <div class="sidebar-sub">Customer Interface</div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-user">
+      <div class="u-label">Logged in as</div>
+      <div class="u-name" id="h-portal-name">—</div>
+      <div class="u-id" id="h-portal-id">—</div>
+    </div>
+    <nav>
+      <button class="nav-btn active" onclick="hNav('home',this)">⬡ &nbsp;Overview</button>
+      <button class="nav-btn" onclick="hNav('order',this)">📦 &nbsp;Place Order</button>
+      <button class="nav-btn" onclick="hNav('myorders',this)">📋 &nbsp;My Orders</button>
+      <button class="nav-btn" onclick="hNav('complaint',this)">🔧 &nbsp;Raise Complaint</button>
+      <button class="nav-btn" onclick="hNav('mytickets',this)">🎫 &nbsp;My Tickets</button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()">← Logout</button>
+    </div>
+  </div>
+  <div class="main">
+    <div id="h-page-home"></div>
+    <div id="h-page-order" class="hidden"></div>
+    <div id="h-page-myorders" class="hidden"></div>
+    <div id="h-page-complaint" class="hidden"></div>
+    <div id="h-page-mytickets" class="hidden"></div>
+  </div>
+</div>
+
+<!-- ═══════════ STAFF DASHBOARD ═══════════ -->
+<div id="staff-portal" class="hidden" style="display:flex;min-height:100vh;">
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-label purple">SUMMIT HEALTHCARE</div>
+      <div class="sidebar-title">DigiSupply</div>
+      <div class="sidebar-sub">Staff Dashboard</div>
+    </div>
+    <div class="sidebar-divider"></div>
+    <nav style="padding-top:16px;">
+      <button class="nav-btn active purple" onclick="sNav('dashboard',this)">⬡ &nbsp;Dashboard</button>
+      <button class="nav-btn" onclick="sNav('orders',this)">📦 &nbsp;All Orders</button>
+      <button class="nav-btn" onclick="sNav('inventory',this)">🏭 &nbsp;Inventory</button>
+      <button class="nav-btn" onclick="sNav('service',this)">🔧 &nbsp;Service Tickets</button>
+      <button class="nav-btn" onclick="sNav('hospitals',this)">🏥 &nbsp;Hospitals</button>
+      <button class="nav-btn" onclick="sNav('reports',this)">📊 &nbsp;Reports</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div style="padding:8px 14px;margin-bottom:8px;">
+        <div style="font-size:11px;color:#334155;">Logged in as</div>
+        <div style="font-size:13px;color:#a78bfa;">summit_admin</div>
+      </div>
+      <button class="logout-btn" onclick="logout()">← Logout</button>
+    </div>
+  </div>
+  <div class="main">
+    <div id="s-page-dashboard"></div>
+    <div id="s-page-orders" class="hidden"></div>
+    <div id="s-page-inventory" class="hidden"></div>
+    <div id="s-page-service" class="hidden"></div>
+    <div id="s-page-hospitals" class="hidden"></div>
+    <div id="s-page-reports" class="hidden"></div>
+  </div>
+</div>
+
+<!-- Modal container -->
+<div id="modal-overlay" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Modal</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let currentUser = null; // {type:'hospital'|'staff', hospital?:{...}}
+let allProducts = [];
+let hOrderFilter = 'All';
+let sOrderFilter = 'All';
+let sSvcFilter = 'All';
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+const API = async (method, path, body) => {
+  const res = await fetch(path, {
+    method, headers: {'Content-Type':'application/json'},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  return res.json();
+};
+const el = id => document.getElementById(id);
+const show = id => { el(id).classList.remove('hidden'); el(id).style.display=''; };
+const hide = id => { el(id).classList.add('hidden'); };
+const hideAll = (...ids) => ids.forEach(hide);
+const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
+
+function badge(text, color, bg) {
+  bg = bg || '#1e293b';
+  return `<span class="badge" style="color:${color};background:${bg};border-color:${color}40">${text}</span>`;
+}
+
+const ORDER_STATUS = {
+  'Received':   {color:'#94a3b8', bg:'#1e293b', next:'Processing'},
+  'Processing': {color:'#f59e0b', bg:'#2d1f00', next:'Dispatched'},
+  'Dispatched': {color:'#3b82f6', bg:'#0c1f3d', next:'Delivered'},
+  'Delivered':  {color:'#22c55e', bg:'#0d2318', next:null},
+};
+const SVC_STATUS = {
+  'Reported':    {color:'#ef4444', bg:'#2d0a0a'},
+  'Assigned':    {color:'#f59e0b', bg:'#2d1f00'},
+  'In Progress': {color:'#3b82f6', bg:'#0c1f3d'},
+  'Resolved':    {color:'#22c55e', bg:'#0d2318'},
+};
+const PRIO_COLOR = {High:'#ef4444', Medium:'#f59e0b', Low:'#94a3b8'};
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function progressDots(steps, current) {
+  return `<div class="progress-dots">${steps.map((s,i)=>{
+    const idx=steps.indexOf(current);
+    const done=i<=idx;
+    const col=steps===ORDER_STEPS?ORDER_STATUS[s].color:SVC_STATUS[s].color;
+    return `<div class="dot" style="width:${steps===ORDER_STEPS?32:28}px;background:${done?col:'#1e293b'}"></div>`;
+  }).join('')}</div>`;
+}
+const ORDER_STEPS = ['Received','Processing','Dispatched','Delivered'];
+const SVC_STEPS   = ['Reported','Assigned','In Progress','Resolved'];
+
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
+async function init() {
+  // Load hospitals for select
+  const hospitals = await API('GET','/api/hospitals');
+  const sel = el('h-hospital-select');
+  hospitals.forEach(h => {
+    const opt = document.createElement('option');
+    opt.value = h.id; opt.textContent = h.name;
+    sel.appendChild(opt);
+  });
+  // Load products
+  allProducts = await API('GET','/api/products');
+}
+
+function showLogin(type) {
+  hide('portal-select');
+  if(type==='hospital') { show('hospital-login'); el('h-password').focus(); }
+  else { show('staff-login'); el('s-username').focus(); }
+}
+function showPortalSelect() {
+  hide('hospital-login'); hide('staff-login');
+  show('portal-select');
+}
+
+async function doHospitalLogin() {
+  const id = el('h-hospital-select').value;
+  const password = el('h-password').value;
+  const res = await API('POST','/api/login/hospital',{id,password});
+  if(res.ok) {
+    currentUser = {type:'hospital', hospital:res.hospital};
+    hide('login-screen');
+    show('hospital-portal');
+    el('h-portal-name').textContent = res.hospital.name;
+    el('h-portal-id').textContent = res.hospital.id;
+    hNav('home', el('hospital-portal').querySelector('.nav-btn'));
+    renderHHome();
+  } else {
+    el('h-err').textContent = res.error; show('h-err');
+  }
+}
+
+async function doStaffLogin() {
+  const username = el('s-username').value;
+  const password = el('s-password').value;
+  const res = await API('POST','/api/login/staff',{username,password});
+  if(res.ok) {
+    currentUser = {type:'staff'};
+    hide('login-screen');
+    show('staff-portal');
+    sNav('dashboard', el('staff-portal').querySelector('.nav-btn'));
+    renderSDashboard();
+  } else {
+    el('s-err').textContent = res.error; show('s-err');
+  }
+}
+
+function logout() {
+  currentUser = null;
+  hide('hospital-portal'); hide('staff-portal');
+  show('login-screen'); show('portal-select');
+  hide('hospital-login'); hide('staff-login');
+  el('h-password').value=''; el('s-username').value=''; el('s-password').value='';
+}
+
+// ─── NAV ──────────────────────────────────────────────────────────────────────
+const H_PAGES = ['home','order','myorders','complaint','mytickets'];
+const S_PAGES = ['dashboard','orders','inventory','service','hospitals','reports'];
+
+function hNav(page, btn) {
+  H_PAGES.forEach(p => hide(`h-page-${p}`));
+  show(`h-page-${page}`);
+  el('hospital-portal').querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(page==='home') renderHHome();
+  if(page==='order') renderHOrder();
+  if(page==='myorders') renderHMyOrders();
+  if(page==='complaint') renderHComplaint();
+  if(page==='mytickets') renderHMyTickets();
+}
+
+function sNav(page, btn) {
+  S_PAGES.forEach(p => hide(`s-page-${p}`));
+  show(`s-page-${page}`);
+  el('staff-portal').querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active','purple'));
+  if(btn) { btn.classList.add('active','purple'); }
+  if(page==='dashboard') renderSDashboard();
+  if(page==='orders') renderSOrders();
+  if(page==='inventory') renderSInventory();
+  if(page==='service') renderSService();
+  if(page==='hospitals') renderSHospitals();
+  if(page==='reports') renderSReports();
+}
+
+// ─── HOSPITAL PORTAL PAGES ───────────────────────────────────────────────────
+async function renderHHome() {
+  const hid = currentUser.hospital.id;
+  const [orders, tickets] = await Promise.all([
+    API('GET',`/api/orders?hospitalId=${hid}`),
+    API('GET',`/api/tickets?hospitalId=${hid}`)
+  ]);
+  const pending = orders.filter(o=>o.status!=='Delivered').length;
+  const openT = tickets.filter(t=>t.status!=='Resolved').length;
+  const resolved = tickets.filter(t=>t.status==='Resolved').length;
+
+  el('h-page-home').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Welcome, ${currentUser.hospital.name} 👋</div>
+      <div class="page-sub">Manage your orders and service requests below.</div>
+    </div>
+    <div class="kpi-grid">
+      ${kpiCard('📦','Total Orders',orders.length,'','#38bdf8')}
+      ${kpiCard('⏳','Pending Orders',pending,'','#f59e0b')}
+      ${kpiCard('🎫','Open Tickets',openT,'','#ef4444')}
+      ${kpiCard('✅','Resolved',resolved,'','#22c55e')}
+    </div>
+    <div class="action-cards">
+      <div class="action-card" onmouseenter="this.style.borderColor='#38bdf8'" onmouseleave="this.style.borderColor='#1e293b'" onclick="hNav('order',null)">
+        <div style="font-size:40px;margin-bottom:12px">📦</div>
+        <div style="font-size:17px;font-weight:700;color:#f1f5f9;margin-bottom:6px">Place New Order</div>
+        <div style="font-size:13px;color:#64748b">Request medical equipment from Summit Healthcare</div>
+      </div>
+      <div class="action-card" onmouseenter="this.style.borderColor='#ef4444'" onmouseleave="this.style.borderColor='#1e293b'" onclick="hNav('complaint',null)">
+        <div style="font-size:40px;margin-bottom:12px">🔧</div>
+        <div style="font-size:17px;font-weight:700;color:#f1f5f9;margin-bottom:6px">Raise Complaint</div>
+        <div style="font-size:13px;color:#64748b">Report an equipment issue or service request</div>
+      </div>
+    </div>`;
+}
+
+async function renderHOrder() {
+  const productOpts = allProducts.map(p=>`<option value="${p.name}">${p.name} — ₹${p.price.toLocaleString('en-IN')}/unit</option>`).join('');
+  el('h-page-order').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Place New Order</div>
+      <div class="page-sub">Request equipment from Summit Healthcare</div>
+    </div>
+    <div class="panel" style="max-width:560px">
+      <div class="form-field">
+        <label class="form-label">Hospital</label>
+        <input class="form-input" value="${currentUser.hospital.name}" disabled style="color:#64748b"/>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Select Product *</label>
+        <select class="form-input" id="o-product" onchange="updateOrderVal()">
+          <option value="">Choose a product...</option>
+          ${productOpts}
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Quantity *</label>
+        <input class="form-input" type="number" min="1" id="o-qty" placeholder="Enter quantity" oninput="updateOrderVal()"/>
+      </div>
+      <div id="o-val-box" class="hidden" style="background:#1e293b;border-radius:10px;padding:12px 16px;margin-bottom:16px">
+        <div style="font-size:13px;color:#64748b">Estimated Order Value</div>
+        <div id="o-val-text" style="font-size:24px;font-weight:700;color:#22c55e;font-family:'DM Mono',monospace"></div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Additional Notes (optional)</label>
+        <textarea class="form-input" id="o-notes" style="height:80px;resize:vertical" placeholder="Any specific requirements..."></textarea>
+      </div>
+      <button class="btn btn-blue" id="o-submit-btn" style="width:100%" onclick="submitOrder()">Submit Order Request</button>
+    </div>`;
+}
+
+function updateOrderVal() {
+  const product = el('o-product').value;
+  const qty = parseInt(el('o-qty').value)||0;
+  const p = allProducts.find(x=>x.name===product);
+  if(p && qty>0) {
+    el('o-val-box').classList.remove('hidden');
+    el('o-val-text').textContent = fmt(p.price * qty);
+  } else {
+    el('o-val-box').classList.add('hidden');
+  }
+}
+
+async function submitOrder() {
+  const product = el('o-product').value;
+  const qty = el('o-qty').value;
+  const notes = el('o-notes').value;
+  if(!product || !qty) return;
+  const today = new Date().toISOString().split('T')[0];
+  const res = await API('POST','/api/orders',{
+    hospitalId: currentUser.hospital.id,
+    customer: currentUser.hospital.name,
+    product, qty, notes, date: today
+  });
+  el('h-page-order').innerHTML = `
+    <div class="success-screen">
+      <div style="font-size:64px;margin-bottom:20px">✅</div>
+      <div style="font-size:24px;font-weight:800;color:#22c55e;margin-bottom:8px">Order Placed Successfully!</div>
+      <div style="color:#64748b;margin-bottom:8px">Your Order ID is</div>
+      <div style="font-size:28px;font-weight:700;color:#38bdf8;font-family:'DM Mono',monospace;margin-bottom:24px">${res.id}</div>
+      <div style="color:#64748b;font-size:14px;margin-bottom:32px">Summit Healthcare will process your order shortly.</div>
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-ghost" onclick="renderHOrder()">Place Another</button>
+        <button class="btn btn-blue" onclick="hNav('myorders',null)">View My Orders →</button>
+      </div>
+    </div>`;
+}
+
+async function renderHMyOrders() {
+  const orders = await API('GET',`/api/orders?hospitalId=${currentUser.hospital.id}`);
+  if(orders.length===0) {
+    el('h-page-myorders').innerHTML=`<div class="page-header"><div class="page-title">My Orders</div></div><div style="text-align:center;padding:60px;color:#475569"><div style="font-size:48px;margin-bottom:16px">📦</div><div>No orders yet. Place your first order!</div></div>`;
+    return;
+  }
+  el('h-page-myorders').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">My Orders</div>
+      <div class="page-sub">${orders.length} orders placed</div>
+    </div>
+    ${orders.map(o=>`
+    <div style="background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:20px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+            <span class="mono" style="font-size:13px;color:#38bdf8">${o.id}</span>
+            ${badge(o.status,ORDER_STATUS[o.status].color,ORDER_STATUS[o.status].bg)}
+          </div>
+          <div style="font-size:17px;font-weight:600;color:#e2e8f0;margin-bottom:4px">${o.product}</div>
+          <div style="font-size:13px;color:#64748b">Qty: ${o.qty} · ${o.date} · <span style="color:#a78bfa">${fmt(o.value)}</span></div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;color:#475569;margin-bottom:6px">Progress</div>
+          ${progressDots(ORDER_STEPS,o.status)}
+        </div>
+      </div>
+    </div>`).join('')}`;
+}
+
+async function renderHComplaint() {
+  const productOpts = allProducts.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
+  el('h-page-complaint').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Raise a Complaint</div>
+      <div class="page-sub">Report an equipment issue or service request</div>
+    </div>
+    <div class="panel" style="max-width:560px">
+      <div class="form-field">
+        <label class="form-label">Hospital</label>
+        <input class="form-input" value="${currentUser.hospital.name}" disabled style="color:#64748b"/>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Equipment / Product *</label>
+        <select class="form-input" id="c-product">
+          <option value="">Select the equipment...</option>
+          ${productOpts}
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Issue Summary *</label>
+        <input class="form-input" id="c-issue" placeholder="e.g. Motor not starting, display flickering..."/>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Priority</label>
+        <div class="prio-group" id="c-prio-group">
+          <button class="prio-btn" id="prio-Low" onclick="setPrio('Low')" style="border-color:#94a3b8">Low</button>
+          <button class="prio-btn" id="prio-Medium" onclick="setPrio('Medium')" style="color:#f59e0b;border-color:#f59e0b;background:#2d1f0040">Medium</button>
+          <button class="prio-btn" id="prio-High" onclick="setPrio('High')">High</button>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Detailed Description (optional)</label>
+        <textarea class="form-input" id="c-details" style="height:80px;resize:vertical" placeholder="Describe the issue in detail..."></textarea>
+      </div>
+      <button class="btn btn-red" id="c-submit-btn" style="width:100%" onclick="submitComplaint()">Submit Complaint</button>
+    </div>`;
+  window._currentPrio = 'Medium';
+}
+
+function setPrio(p) {
+  window._currentPrio = p;
+  const colors = {High:'#ef4444',Medium:'#f59e0b',Low:'#94a3b8'};
+  ['Low','Medium','High'].forEach(x=>{
+    const btn = el(`prio-${x}`);
+    if(x===p) {
+      btn.style.color=colors[x]; btn.style.borderColor=colors[x]; btn.style.background=colors[x]+'20';
+    } else {
+      btn.style.color='#64748b'; btn.style.borderColor='#334155'; btn.style.background='#1e293b';
+    }
+  });
+}
+
+async function submitComplaint() {
+  const product = el('c-product').value;
+  const issue = el('c-issue').value;
+  const details = el('c-details').value;
+  if(!product || !issue) return;
+  const today = new Date().toISOString().split('T')[0];
+  const res = await API('POST','/api/tickets',{
+    hospitalId: currentUser.hospital.id,
+    customer: currentUser.hospital.name,
+    product, issue, details,
+    priority: window._currentPrio || 'Medium',
+    date: today
+  });
+  el('h-page-complaint').innerHTML = `
+    <div class="success-screen">
+      <div style="font-size:64px;margin-bottom:20px">🎫</div>
+      <div style="font-size:24px;font-weight:800;color:#f59e0b;margin-bottom:8px">Complaint Registered!</div>
+      <div style="color:#64748b;margin-bottom:8px">Your Ticket ID is</div>
+      <div style="font-size:28px;font-weight:700;color:#38bdf8;font-family:'DM Mono',monospace;margin-bottom:24px">${res.id}</div>
+      <div style="color:#64748b;font-size:14px;margin-bottom:32px">Our service engineer will be assigned shortly.</div>
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-ghost" onclick="renderHComplaint()">Raise Another</button>
+        <button class="btn btn-red" onclick="hNav('mytickets',null)">Track My Tickets →</button>
+      </div>
+    </div>`;
+}
+
+async function renderHMyTickets() {
+  const tickets = await API('GET',`/api/tickets?hospitalId=${currentUser.hospital.id}`);
+  if(tickets.length===0) {
+    el('h-page-mytickets').innerHTML=`<div class="page-header"><div class="page-title">My Service Tickets</div></div><div style="text-align:center;padding:60px;color:#475569"><div style="font-size:48px;margin-bottom:16px">🎫</div><div>No complaints raised yet.</div></div>`;
+    return;
+  }
+  el('h-page-mytickets').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">My Service Tickets</div>
+      <div class="page-sub">${tickets.length} tickets raised</div>
+    </div>
+    ${tickets.map(t=>`
+    <div class="ticket-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+            <span class="mono" style="font-size:13px;color:#38bdf8">${t.id}</span>
+            ${badge(t.priority,PRIO_COLOR[t.priority])}
+            ${badge(t.status,SVC_STATUS[t.status].color,SVC_STATUS[t.status].bg)}
+          </div>
+          <div style="font-size:17px;font-weight:600;color:#e2e8f0;margin-bottom:4px">${t.issue}</div>
+          <div style="font-size:13px;color:#64748b">${t.product} · ${t.date}</div>
+          <div style="font-size:13px;color:#475569;margin-top:4px">Engineer: <span style="color:${t.engineer==='Unassigned'?'#ef4444':'#a78bfa'}">${t.engineer}</span></div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;color:#475569;margin-bottom:6px">Progress</div>
+          ${progressDots(SVC_STEPS,t.status)}
+        </div>
+      </div>
+    </div>`).join('')}`;
+}
+
+// ─── STAFF DASHBOARD PAGES ────────────────────────────────────────────────────
+function kpiCard(icon,label,value,sub,color) {
+  return `<div class="kpi-card">
+    <div class="kpi-bar" style="background:${color}"></div>
+    <div class="kpi-icon">${icon}</div>
+    <div class="kpi-value">${value}</div>
+    <div class="kpi-label">${label}</div>
+    ${sub?`<div class="kpi-sub" style="color:${color}">${sub}</div>`:''}
+  </div>`;
+}
+
+async function renderSDashboard() {
+  const [orders, inventory, tickets] = await Promise.all([
+    API('GET','/api/orders'), API('GET','/api/inventory'), API('GET','/api/tickets')
+  ]);
+  const totalVal = orders.reduce((s,o)=>s+o.value,0);
+  const pending = orders.filter(o=>o.status!=='Delivered').length;
+  const lowStock = inventory.filter(i=>stockLevel(i)!=='Good').length;
+  const openSvc = tickets.filter(t=>t.status!=='Resolved').length;
+  const statusCounts = {};
+  ['Received','Processing','Dispatched','Delivered'].forEach(s=>{ statusCounts[s]=orders.filter(o=>o.status===s).length; });
+
+  const MONTHLY = [4,7,9,6,11,8,13,10,7,15,12,9];
+  const maxM = Math.max(...MONTHLY);
+
+  el('s-page-dashboard').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Staff Dashboard</div>
+      <div class="page-sub">Summit Healthcare — Internal Operations View</div>
+    </div>
+    <div class="kpi-grid">
+      ${kpiCard('📦','Total Orders',orders.length,`₹${(totalVal/100000).toFixed(1)}L value`,'#38bdf8')}
+      ${kpiCard('⏳','Pending Orders',pending,'','#f59e0b')}
+      ${kpiCard('🏭','Low Stock Items',lowStock,'','#a78bfa')}
+      ${kpiCard('🔧','Open Tickets',openSvc,'','#ef4444')}
+    </div>
+    <div class="two-col" style="margin-bottom:20px">
+      <div class="panel">
+        <div class="panel-title">Monthly Orders (2024)</div>
+        <div class="bar-chart">
+          ${MONTHLY.map((v,i)=>`
+          <div class="bar-col">
+            <div class="bar-tooltip">
+              <div style="font-size:11px;color:#94a3b8">${MONTHS[i]}</div>
+              <div style="font-size:15px;font-weight:700;color:#a78bfa">${v} orders</div>
+            </div>
+            <div class="bar-fill" style="height:${Math.max((v/maxM)*130,4)}px;background:linear-gradient(180deg,#a78bfa,#7c3aed)"></div>
+          </div>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px">${MONTHS.map(m=>`<div style="flex:1;text-align:center;font-size:9px;color:#64748b">${m}</div>`).join('')}</div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Order Status</div>
+        ${['Received','Processing','Dispatched','Delivered'].map(s=>`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="flex:1;font-size:13px;color:#94a3b8">${s}</div>
+          <div style="width:100px;height:8px;background:#1e293b;border-radius:4px;overflow:hidden">
+            <div style="width:${orders.length?(statusCounts[s]/orders.length*100):0}%;height:100%;background:${ORDER_STATUS[s].color};border-radius:4px"></div>
+          </div>
+          <div style="font-size:13px;color:${ORDER_STATUS[s].color};width:20px;text-align:right">${statusCounts[s]}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Recent Orders</div>
+      <table>
+        <thead><tr><th>Order ID</th><th>Hospital</th><th>Product</th><th>Value</th><th>Status</th></tr></thead>
+        <tbody>
+          ${orders.slice(0,5).map(o=>`<tr>
+            <td class="mono" style="color:#38bdf8">${o.id}</td>
+            <td>${o.customer}</td>
+            <td style="color:#94a3b8">${o.product}</td>
+            <td class="mono" style="color:#a78bfa">${fmt(o.value)}</td>
+            <td>${badge(o.status,ORDER_STATUS[o.status].color,ORDER_STATUS[o.status].bg)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+async function renderSOrders() {
+  const allOrders = await API('GET','/api/orders');
+  const filtered = sOrderFilter==='All' ? allOrders : allOrders.filter(o=>o.status===sOrderFilter);
+
+  el('s-page-orders').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">All Orders</div>
+      <div class="page-sub">From all hospitals · ${allOrders.length} total</div>
+    </div>
+    <div class="filters">
+      ${['All','Received','Processing','Dispatched','Delivered'].map(s=>`
+      <button class="filter-btn ${sOrderFilter===s?'active-purple':''}" onclick="setSOrderFilter('${s}')">${s}</button>`).join('')}
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Order ID</th><th>Hospital</th><th>Product</th><th>Qty</th><th>Date</th><th>Value</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          ${filtered.map(o=>`<tr>
+            <td class="mono" style="color:#38bdf8">${o.id}</td>
+            <td>${o.customer}</td>
+            <td style="color:#94a3b8">${o.product}</td>
+            <td>${o.qty}</td>
+            <td style="color:#64748b">${o.date}</td>
+            <td class="mono" style="color:#a78bfa">${fmt(o.value)}</td>
+            <td>${badge(o.status,ORDER_STATUS[o.status].color,ORDER_STATUS[o.status].bg)}</td>
+            <td>${ORDER_STATUS[o.status].next?`<button class="btn btn-ghost btn-sm" style="color:#a78bfa" onclick="advanceOrder('${o.id}')">→ ${ORDER_STATUS[o.status].next}</button>`:'—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function setSOrderFilter(f) { sOrderFilter=f; renderSOrders(); }
+
+async function advanceOrder(id) {
+  await API('POST',`/api/orders/${id}/advance`);
+  renderSOrders();
+}
+
+function stockLevel(item) {
+  const r = item.stock/item.reorder;
+  if(r<=1) return 'Critical';
+  if(r<=1.5) return 'Low';
+  return 'Good';
+}
+const STOCK_COLOR = {Critical:'#ef4444',Low:'#f59e0b',Good:'#22c55e'};
+
+async function renderSInventory() {
+  const inventory = await API('GET','/api/inventory');
+  const lowCount = inventory.filter(i=>stockLevel(i)!=='Good').length;
+
+  el('s-page-inventory').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <div class="page-header" style="margin-bottom:0">
+        <div class="page-title">Inventory Management</div>
+        <div class="page-sub">${lowCount} items need restocking</div>
+      </div>
+      <button class="btn btn-purple" onclick="showAddProduct()">+ Add Product</button>
+    </div>
+    <div class="inv-grid">
+      ${inventory.map(item=>{
+        const lvl=stockLevel(item); const col=STOCK_COLOR[lvl];
+        const pct=Math.min((item.stock/(item.reorder*3))*100,100);
+        return `<div class="inv-card">
+          <div style="position:absolute;top:12px;right:12px">${badge(lvl,col)}</div>
+          <div class="mono" style="font-size:11px;color:#64748b;margin-bottom:4px">${item.id}</div>
+          <div style="font-size:15px;font-weight:600;color:#e2e8f0;margin-bottom:4px;padding-right:60px">${item.name}</div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:14px">${item.category} · ${item.supplier}</div>
+          <div style="font-size:30px;font-weight:700;color:${col};font-family:'DM Mono',monospace;margin-bottom:6px">${item.stock} <span style="font-size:13px;color:#64748b;font-family:'Syne',sans-serif">units</span></div>
+          <div style="height:6px;background:#1e293b;border-radius:3px;margin-bottom:10px">
+            <div style="width:${pct}%;height:100%;background:${col};border-radius:3px"></div>
+          </div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:12px">Reorder at: ${item.reorder} units</div>
+          <button class="btn btn-ghost btn-sm" onclick="showEditProduct('${item.id}')">Edit Stock</button>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function showAddProduct() {
+  el('modal-title').textContent = 'Add Product';
+  el('modal-body').innerHTML = `
+    <div class="form-field"><label class="form-label">Product Name</label><input class="form-input" id="m-name"/></div>
+    <div class="form-grid">
+      <div class="form-field"><label class="form-label">Category</label><input class="form-input" id="m-cat"/></div>
+      <div class="form-field"><label class="form-label">Supplier</label><input class="form-input" id="m-sup"/></div>
+      <div class="form-field"><label class="form-label">Stock</label><input class="form-input" type="number" id="m-stock"/></div>
+      <div class="form-field"><label class="form-label">Reorder Level</label><input class="form-input" type="number" id="m-reorder"/></div>
+    </div>
+    <button class="btn btn-purple" style="width:100%;margin-top:8px" onclick="saveProduct(null)">Add Product</button>`;
+  show('modal-overlay');
+}
+
+async function showEditProduct(id) {
+  const inventory = await API('GET','/api/inventory');
+  const item = inventory.find(i=>i.id===id);
+  el('modal-title').textContent = 'Edit Product';
+  el('modal-body').innerHTML = `
+    <div class="form-field"><label class="form-label">Product Name</label><input class="form-input" id="m-name" value="${item.name}"/></div>
+    <div class="form-grid">
+      <div class="form-field"><label class="form-label">Category</label><input class="form-input" id="m-cat" value="${item.category}"/></div>
+      <div class="form-field"><label class="form-label">Supplier</label><input class="form-input" id="m-sup" value="${item.supplier}"/></div>
+      <div class="form-field"><label class="form-label">Stock</label><input class="form-input" type="number" id="m-stock" value="${item.stock}"/></div>
+      <div class="form-field"><label class="form-label">Reorder Level</label><input class="form-input" type="number" id="m-reorder" value="${item.reorder}"/></div>
+    </div>
+    <button class="btn btn-purple" style="width:100%;margin-top:8px" onclick="saveProduct('${id}')">Update Product</button>`;
+  show('modal-overlay');
+}
+
+async function saveProduct(id) {
+  const data = { name:el('m-name').value, category:el('m-cat').value, supplier:el('m-sup').value, stock:el('m-stock').value, reorder:el('m-reorder').value, unit:'Units' };
+  if(id) await API('PUT',`/api/inventory/${id}`,data);
+  else await API('POST','/api/inventory',data);
+  closeModal(); renderSInventory();
+}
+
+function closeModal() { hide('modal-overlay'); }
+
+async function renderSService() {
+  const allTickets = await API('GET','/api/tickets');
+  const filtered = sSvcFilter==='All' ? allTickets : allTickets.filter(t=>t.status===sSvcFilter);
+
+  el('s-page-service').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Service Tickets</div>
+      <div class="page-sub">All hospitals · ${allTickets.filter(t=>t.status!=='Resolved').length} open</div>
+    </div>
+    <div class="filters">
+      ${['All','Reported','Assigned','In Progress','Resolved'].map(s=>`
+      <button class="filter-btn ${sSvcFilter===s?'active-red':''}" onclick="setSSvcFilter('${s}')">${s}</button>`).join('')}
+    </div>
+    ${filtered.map(t=>`
+    <div class="ticket-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+            <span class="mono" style="font-size:13px;color:#38bdf8">${t.id}</span>
+            ${badge(t.priority,PRIO_COLOR[t.priority])}
+            ${badge(t.status,SVC_STATUS[t.status].color,SVC_STATUS[t.status].bg)}
+          </div>
+          <div style="font-size:16px;font-weight:600;color:#e2e8f0;margin-bottom:4px">${t.issue}</div>
+          <div style="font-size:13px;color:#94a3b8"><span style="color:#38bdf8">${t.customer}</span> · ${t.product} · ${t.date}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+            <span style="font-size:12px;color:#64748b">Assign Engineer:</span>
+            <select style="background:#1e293b;border:1px solid #334155;border-radius:6px;padding:4px 8px;color:${t.engineer==='Unassigned'?'#ef4444':'#a78bfa'};font-size:12px;cursor:pointer;font-family:'Syne',sans-serif" onchange="assignEngineer('${t.id}',this.value)">
+              <option ${t.engineer==='Unassigned'?'selected':''}>Unassigned</option>
+              <option ${t.engineer==='Rahul Patil'?'selected':''}>Rahul Patil</option>
+              <option ${t.engineer==='Sameer Joshi'?'selected':''}>Sameer Joshi</option>
+              <option ${t.engineer==='Priya Nair'?'selected':''}>Priya Nair</option>
+            </select>
+          </div>
+        </div>
+        <div>${t.status!=='Resolved'?`<button class="btn btn-ghost btn-sm" style="color:#38bdf8" onclick="advanceTicket('${t.id}')">Advance →</button>`:''}</div>
+      </div>
+    </div>`).join('')}`;
+}
+
+function setSSvcFilter(f) { sSvcFilter=f; renderSService(); }
+async function advanceTicket(id) { await API('POST',`/api/tickets/${id}/advance`); renderSService(); }
+async function assignEngineer(id,eng) { await API('PUT',`/api/tickets/${id}/engineer`,{engineer:eng}); }
+
+async function renderSHospitals() {
+  const [hospitals, orders, tickets] = await Promise.all([
+    API('GET','/api/hospitals'), API('GET','/api/orders'), API('GET','/api/tickets')
+  ]);
+  el('s-page-hospitals').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Registered Hospitals</div>
+      <div class="page-sub">${hospitals.length} hospitals onboarded</div>
+    </div>
+    ${hospitals.map(h=>{
+      const hOrders=orders.filter(o=>o.hospitalId===h.id);
+      const hTickets=tickets.filter(t=>t.hospitalId===h.id);
+      const val=hOrders.reduce((s,o)=>s+o.value,0);
+      return `<div class="hosp-row">
+        <div>
+          <div class="mono" style="font-size:11px;color:#64748b;margin-bottom:4px">${h.id}</div>
+          <div style="font-size:17px;font-weight:600;color:#e2e8f0;margin-bottom:4px">${h.name}</div>
+          <div style="font-size:13px;color:#64748b">Contact: ${h.contact}</div>
+        </div>
+        <div class="hosp-stats">
+          <div><div style="font-size:22px;font-weight:700;color:#38bdf8">${hOrders.length}</div><div style="font-size:11px;color:#64748b">Orders</div></div>
+          <div><div style="font-size:22px;font-weight:700;color:#a78bfa">₹${(val/1000).toFixed(0)}K</div><div style="font-size:11px;color:#64748b">Value</div></div>
+          <div><div style="font-size:22px;font-weight:700;color:#f59e0b">${hTickets.length}</div><div style="font-size:11px;color:#64748b">Tickets</div></div>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+async function renderSReports() {
+  const [orders, inventory, tickets] = await Promise.all([
+    API('GET','/api/orders'), API('GET','/api/inventory'), API('GET','/api/tickets')
+  ]);
+  const totalVal = orders.reduce((s,o)=>s+o.value,0);
+  const deliveredVal = orders.filter(o=>o.status==='Delivered').reduce((s,o)=>s+o.value,0);
+  const topProducts = Object.entries(orders.reduce((acc,o)=>{acc[o.product]=(acc[o.product]||0)+1;return acc;},{})).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+  // Month-wise sales from actual order dates
+  const monthlySales = MONTHS.map((label,i)=>{
+    const mo = orders.filter(o=>{ const d=new Date(o.date); return d.getFullYear()===2025&&d.getMonth()===i; });
+    return {label, value:mo.reduce((s,o)=>s+o.value,0), count:mo.length};
+  });
+  const maxSale = Math.max(...monthlySales.map(m=>m.value),1);
+  const resRate = tickets.length ? Math.round(tickets.filter(t=>t.status==='Resolved').length/tickets.length*100) : 0;
+
+  el('s-page-reports').innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Reports & Analytics</div>
+      <div class="page-sub">Business performance summary — 2025</div>
+    </div>
+    <div class="kpi-grid">
+      ${kpiCard('💰','Total Sales Value',`₹${(totalVal/100000).toFixed(1)}L`,'','#22c55e')}
+      ${kpiCard('✅','Fulfillment Rate',`${Math.round(deliveredVal/(totalVal||1)*100)}%`,'','#38bdf8')}
+      ${kpiCard('⚡','Avg Resolution','2.4 days','','#f59e0b')}
+      ${kpiCard('📊','Ticket Resolution',`${resRate}%`,'','#a78bfa')}
+    </div>
+
+    <!-- Monthly Sales Chart -->
+    <div class="panel" style="margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px">
+        <div>
+          <div style="font-weight:700;font-size:17px;color:#e2e8f0">Monthly Sales Value — 2025</div>
+          <div style="font-size:13px;color:#64748b;margin-top:4px">Hover over a bar to see exact figures</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:#64748b">Total Year</div>
+          <div style="font-size:22px;font-weight:700;color:#22c55e;font-family:'DM Mono',monospace">₹${(totalVal/100000).toFixed(2)}L</div>
+        </div>
+      </div>
+      <div class="bar-chart">
+        ${monthlySales.map((m,i)=>{
+          const h=m.value>0?Math.max((m.value/maxSale)*130,8):4;
+          return `<div class="bar-col">
+            <div class="bar-tooltip">
+              <div style="font-size:11px;color:#94a3b8">${m.label} 2025</div>
+              <div style="font-size:15px;font-weight:700;color:#22c55e;font-family:'DM Mono',monospace">₹${(m.value/1000).toFixed(0)}K</div>
+              <div style="font-size:11px;color:#64748b">${m.count} order${m.count!==1?'s':''}</div>
+            </div>
+            <div class="bar-fill" style="height:${h}px;background:${m.value>0?'linear-gradient(180deg,#4ade80,#059669)':'#1e293b'}"></div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:8px">${monthlySales.map(m=>`<div style="flex:1;text-align:center;font-size:10px;color:#64748b">${m.label}</div>`).join('')}</div>
+
+      <!-- Monthly table -->
+      <div style="margin-top:24px;border-top:1px solid #1e293b;padding-top:20px">
+        <div style="font-weight:600;color:#94a3b8;font-size:13px;margin-bottom:12px">Month-wise Breakdown</div>
+        <table>
+          <thead><tr><th>Month</th><th>Orders</th><th>Sales Value</th><th>Avg Order Value</th><th>Share</th></tr></thead>
+          <tbody>
+            ${monthlySales.filter(m=>m.count>0).map(m=>`<tr>
+              <td style="font-weight:600;color:#e2e8f0">${m.label} 2025</td>
+              <td class="mono" style="color:#38bdf8">${m.count}</td>
+              <td class="mono" style="color:#22c55e;font-weight:600">${fmt(m.value)}</td>
+              <td class="mono" style="color:#94a3b8">${fmt(Math.round(m.value/m.count))}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:80px;height:6px;background:#1e293b;border-radius:3px">
+                    <div style="width:${totalVal?(m.value/totalVal*100):0}%;height:100%;background:#22c55e;border-radius:3px"></div>
+                  </div>
+                  <span style="font-size:12px;color:#64748b">${totalVal?((m.value/totalVal)*100).toFixed(1):0}%</span>
+                </div>
+              </td>
+            </tr>`).join('')}
+            <tr style="border-top:2px solid #334155;font-weight:700">
+              <td style="color:#f1f5f9">Total</td>
+              <td class="mono" style="color:#38bdf8">${orders.length}</td>
+              <td class="mono" style="color:#22c55e;font-size:14px">${fmt(totalVal)}</td>
+              <td class="mono" style="color:#94a3b8">${fmt(Math.round(totalVal/(orders.length||1)))}</td>
+              <td style="color:#22c55e">100%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-title">Top Ordered Products</div>
+        ${topProducts.map(([name,count],i)=>`
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <div style="font-size:16px;color:#334155;font-weight:700;width:20px">${i+1}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;color:#e2e8f0;margin-bottom:4px">${name}</div>
+            <div style="height:6px;background:#1e293b;border-radius:3px">
+              <div style="width:${(count/topProducts[0][1])*100}%;height:100%;background:#a78bfa;border-radius:3px"></div>
+            </div>
+          </div>
+          <div class="mono" style="font-size:13px;color:#a78bfa">${count}</div>
+        </div>`).join('')}
+      </div>
+      <div class="panel">
+        <div class="panel-title">Inventory Health</div>
+        ${inventory.map(item=>{
+          const lvl=stockLevel(item); const col=STOCK_COLOR[lvl];
+          return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0"></div>
+            <div style="flex:1;font-size:13px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.name}</div>
+            <div class="mono" style="font-size:13px;color:${col}">${item.stock}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
