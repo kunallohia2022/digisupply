@@ -742,7 +742,7 @@ async function renderSDashboard() {
     </div>
     <div class="two-col" style="margin-bottom:20px">
       <div class="panel">
-        <div class="panel-title">Monthly Orders (2024)</div>
+        <div class="panel-title">Monthly Orders (2026)</div>
         <div class="bar-chart">
           ${MONTHLY.map((v,i)=>`
           <div class="bar-col">
@@ -983,7 +983,7 @@ async function renderSReports() {
 
   // Month-wise sales from actual order dates
   const monthlySales = MONTHS.map((label,i)=>{
-    const mo = orders.filter(o=>{ const d=new Date(o.date); return d.getFullYear()===2025&&d.getMonth()===i; });
+    const mo = orders.filter(o=>{ const d=new Date(o.date); return d.getFullYear()===2026&&d.getMonth()===i; });
     return {label, value:mo.reduce((s,o)=>s+o.value,0), count:mo.length};
   });
   const maxSale = Math.max(...monthlySales.map(m=>m.value),1);
@@ -992,7 +992,7 @@ async function renderSReports() {
   el('s-page-reports').innerHTML = `
     <div class="page-header">
       <div class="page-title">Reports & Analytics</div>
-      <div class="page-sub">Business performance summary — 2025</div>
+      <div class="page-sub">Business performance summary — 2026</div>
     </div>
     <div class="kpi-grid">
       ${kpiCard('💰','Total Sales Value',`₹${(totalVal/100000).toFixed(1)}L`,'','#22c55e')}
@@ -1005,7 +1005,7 @@ async function renderSReports() {
     <div class="panel" style="margin-bottom:20px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px">
         <div>
-          <div style="font-weight:700;font-size:17px;color:#e2e8f0">Monthly Sales Value — 2025</div>
+          <div style="font-weight:700;font-size:17px;color:#e2e8f0">Monthly Sales Value — 2026</div>
           <div style="font-size:13px;color:#64748b;margin-top:4px">Hover over a bar to see exact figures</div>
         </div>
         <div style="text-align:right">
@@ -1018,7 +1018,7 @@ async function renderSReports() {
           const h=m.value>0?Math.max((m.value/maxSale)*130,8):4;
           return `<div class="bar-col">
             <div class="bar-tooltip">
-              <div style="font-size:11px;color:#94a3b8">${m.label} 2025</div>
+              <div style="font-size:11px;color:#94a3b8">${m.label} 2026</div>
               <div style="font-size:15px;font-weight:700;color:#22c55e;font-family:'DM Mono',monospace">₹${(m.value/1000).toFixed(0)}K</div>
               <div style="font-size:11px;color:#64748b">${m.count} order${m.count!==1?'s':''}</div>
             </div>
@@ -1035,7 +1035,7 @@ async function renderSReports() {
           <thead><tr><th>Month</th><th>Orders</th><th>Sales Value</th><th>Avg Order Value</th><th>Share</th></tr></thead>
           <tbody>
             ${monthlySales.filter(m=>m.count>0).map(m=>`<tr>
-              <td style="font-weight:600;color:#e2e8f0">${m.label} 2025</td>
+              <td style="font-weight:600;color:#e2e8f0">${m.label} 2026</td>
               <td class="mono" style="color:#38bdf8">${m.count}</td>
               <td class="mono" style="color:#22c55e;font-weight:600">${fmt(m.value)}</td>
               <td class="mono" style="color:#94a3b8">${fmt(Math.round(m.value/m.count))}</td>
